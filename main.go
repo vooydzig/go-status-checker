@@ -1,12 +1,23 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
 	"statusServer/statuscheck"
 )
 
+func getConfigFromArgs() string {
+	flag.Parse()
+	if flag.NArg() != 1 {
+		log.Fatal("Please provide config for services to check")
+	}
+	return flag.Arg(0)
+}
+
 func main() {
-	config := statuscheck.ReadConfig("./endpoints.ini")
+	filename := getConfigFromArgs()
+	config := statuscheck.ReadConfig(filename)
 	status := statuscheck.PingServices(config)
 	fmt.Println("Service status check")
 	for service_name, stat := range status {
