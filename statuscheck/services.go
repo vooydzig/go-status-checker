@@ -28,7 +28,7 @@ func PingServices(config []Service) map[string]*Status {
 }
 
 func PingServce(service Service, wg *sync.WaitGroup, status map[string]*Status) {
-	if service.Type == "endpoint" {
+	if service.Type == "http" {
 		status[service.Name] = PingEndpoint(service)
 	} else if service.Type == "db" {
 		status[service.Name] = PingDatabase(service)
