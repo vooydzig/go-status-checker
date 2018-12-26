@@ -35,6 +35,7 @@ func getDataSource(driver string, service Service) string {
 
 func PingDatabase(service Service) *Status {
 	status := new(Status)
+	status.ServiceName = service.Name
 	driver := service.Params["driver"]
 	if !isDriverSupported(service.Params["driver"], SUPPORTED_DRIVERS) {
 		status.IsRunning = false

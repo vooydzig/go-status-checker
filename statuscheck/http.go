@@ -16,6 +16,7 @@ func isSucessfulResponse(item int) bool {
 
 func PingEndpoint(service Service) *Status {
 	status := new(Status)
+	status.ServiceName = service.Name
 	resp, err := http.Get(service.Params["url"])
 	if err != nil {
 		status.IsRunning = false

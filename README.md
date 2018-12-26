@@ -4,7 +4,8 @@ Usage
 2. compile 
 3. run `./checker config.ini`
 
-Sample output
+
+Sample CMD output
 =
 ```
 Service status check
@@ -13,6 +14,28 @@ Service status check
 	Google...OK
 
 ```
+
+HTTP Server Mode
+=
+You can run service checker as standalone HTTP server:
+`./checker -http config.ini`
+
+This will spawn HTTP server on localhost, port: 5555. 
+This is example response from server:
+```
+[
+    {
+        "name": "Database",
+        "is_running":false,
+        "error":"pq: database \"dbname\" does not exist"
+    }, {
+        "name": "Google", 
+        "is_running":true,
+        "error":""
+    }
+]
+```
+
 
 Config structure
 =

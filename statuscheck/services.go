@@ -12,8 +12,9 @@ type Service struct {
 }
 
 type Status struct {
-	IsRunning bool
-	Error     string
+	ServiceName string `json:"name"`
+	IsRunning   bool   `json:"is_running"`
+	Error       string `json:"error"`
 }
 
 func PingServices(config []Service) map[string]*Status {
@@ -33,10 +34,15 @@ func PingServce(service Service, wg *sync.WaitGroup, status map[string]*Status) 
 	} else if service.Type == "db" {
 		status[service.Name] = PingDatabase(service)
 	} else {
-		s := new(Status)
-		s.IsRunning = false
-		s.Error = fmt.Sprintf("Unknown service type \"%s\" for service \"%s\"\n", service.Type, service.Name)
-		status[service.Name] = s
+		status[service.Name] = unknownService(service)
 	}
 	wg.Done()
+}
+
+func unknownService(service Service) *Status {
+	s := new(Status)
+	s.ServiceName = service.Name
+	s.IsRunning = false
+	s.Error = fmt.Sprintf("Unknown service type \"%s\" for service \"%s\"\n", service.Type, service.Name)
+	return s
 }
