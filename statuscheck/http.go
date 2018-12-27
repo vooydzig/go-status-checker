@@ -1,6 +1,7 @@
 package statuscheck
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -14,18 +15,17 @@ func isSucessfulResponse(item int) bool {
 	return false
 }
 
-func PingEndpoint(service Service) *Status {
-	status := new(Status)
-	status.ServiceName = service.Name
+func PingEndpoint(service Service) Status {
 	resp, err := http.Get(service.Params["url"])
 	if err != nil {
-		status.IsRunning = false
-		status.Error = err.Error()
-		return status
+		return Status{service.Name, false, err.Error()}
 	}
 	if isSucessfulResponse(resp.StatusCode) {
-		status.IsRunning = true
-		status.Error = ""
+		return Status{service.Name, true, ""}
 	}
-	return status
+	return Status{
+		service.Name,
+		false,
+		fmt.Sprintf("Received HTTP %d for URL %s", resp.StatusCode, service.Params["url"]),
+	}
 }

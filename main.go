@@ -10,9 +10,9 @@ import (
 )
 
 func runServer() bool {
-	http := flag.Bool("http", false, "Run http server with statuses")
+	useHttp := flag.Bool("useHttp", false, "Run useHttp server with statuses")
 	flag.Parse()
-	return *http
+	return *useHttp
 }
 
 func getFilename() string {
@@ -26,25 +26,22 @@ func cmdHandler(filename string) {
 	config := statuscheck.ReadConfig(filename)
 	status := statuscheck.PingServices(config)
 	fmt.Println("Service status check")
-	for service_name, stat := range status {
+	for i := 0; i < len(status); i++ {
+		stat := status[i]
 		if stat.IsRunning {
-			fmt.Printf("\t%s...OK\n", service_name)
+			fmt.Printf("\t%s...OK\n", stat.ServiceName)
 		} else {
-			fmt.Printf("\t%s...error\n\t\t%s\n", service_name, stat.Error)
+			fmt.Printf("\t%s...error\n\t\t%s\n", stat.ServiceName, stat.Error)
 		}
 	}
 }
 
-func httpHandler(w http.ResponseWriter, r *http.Request) {
+func httpHandler(w http.ResponseWriter, _ *http.Request) {
 	filename := getFilename()
 	config := statuscheck.ReadConfig(filename)
 	status := statuscheck.PingServices(config)
 	w.Header().Set("Content-Type", "application/json")
-	var response []statuscheck.Status
-	for _, stat := range status {
-		response = append(response, *stat)
-	}
-	js, err := json.Marshal(response)
+	js, err := json.Marshal(status)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

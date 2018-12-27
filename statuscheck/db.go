@@ -33,29 +33,23 @@ func getDataSource(driver string, service Service) string {
 	return r.Replace(CONNECTION_STRINGS[driver])
 }
 
-func PingDatabase(service Service) *Status {
-	status := new(Status)
-	status.ServiceName = service.Name
+func PingDatabase(service Service) Status {
 	driver := service.Params["driver"]
 	if !isDriverSupported(service.Params["driver"], SUPPORTED_DRIVERS) {
-		status.IsRunning = false
-		status.Error = fmt.Sprintf("Unknown dbdriver \"%s\"", driver)
-		return status
+		return Status{
+			service.Name,
+			false,
+			fmt.Sprintf("Unknown dbdriver \"%s\"", driver),
+		}
 	}
 	db, err := sql.Open(driver, getDataSource(driver, service))
 	if err != nil {
-		status.IsRunning = false
-		status.Error = fmt.Sprintf(err.Error())
-		return status
+		return Status{service.Name, false, err.Error()}
 	}
 	defer db.Close()
 	err = db.Ping()
 	if err != nil {
-		status.IsRunning = false
-		status.Error = fmt.Sprintf(err.Error())
-		return status
+		return Status{service.Name, false, err.Error()}
 	}
-	status.IsRunning = true
-	status.Error = ""
-	return status
+	return Status{service.Name, true, ""}
 }

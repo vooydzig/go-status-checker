@@ -17,32 +17,32 @@ type Status struct {
 	Error       string `json:"error"`
 }
 
-func PingServices(config []Service) map[string]*Status {
+func PingServices(config []Service) []Status {
 	var wg sync.WaitGroup
-	status := make(map[string]*Status)
+	status := []Status{}
 	wg.Add(len(config))
 	for i := 0; i < len(config); i++ {
-		go PingServce(config[i], &wg, status)
+		go PingServce(config[i], &wg, &status)
 	}
 	wg.Wait()
 	return status
 }
 
-func PingServce(service Service, wg *sync.WaitGroup, status map[string]*Status) {
+func PingServce(service Service, wg *sync.WaitGroup, status *[]Status) {
 	if service.Type == "http" {
-		status[service.Name] = PingEndpoint(service)
+		*status = append(*status, PingEndpoint(service))
 	} else if service.Type == "db" {
-		status[service.Name] = PingDatabase(service)
+		*status = append(*status, PingDatabase(service))
 	} else {
-		status[service.Name] = unknownService(service)
+		*status = append(*status, unknownService(service))
 	}
 	wg.Done()
 }
 
-func unknownService(service Service) *Status {
-	s := new(Status)
-	s.ServiceName = service.Name
-	s.IsRunning = false
-	s.Error = fmt.Sprintf("Unknown service type \"%s\" for service \"%s\"\n", service.Type, service.Name)
-	return s
+func unknownService(service Service) Status {
+	return Status{
+		service.Name,
+		false,
+		fmt.Sprintf("Unknown service type \"%s\" for service \"%s\"\n", service.Type, service.Name),
+	}
 }
