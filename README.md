@@ -1,7 +1,7 @@
 Usage
 =
-1. clone
-2. compile 
+1. clone 
+2. compile `go build -o checker` 
 3. run `./checker config.ini`
 
 
@@ -38,7 +38,9 @@ This is example response from server:
 
 
 Config structure
-=
+= 
+Check `endpoints.ini` for config example
+
 Structure for HTTP services
 -
 ```
